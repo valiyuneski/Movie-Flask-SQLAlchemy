@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Home - My Movie App{% endblock %}
+
+{% block content %}
+    <h2>Welcome to My Movie App</h2>
+    <p>Browse users, add your favorite movies, and explore movie details from the OMDb API.</p>
+
+    <section>
+        <h3>Quick Links</h3>
+        <ul>
+            <li><a href="{{ url_for('list_users') }}">View Users</a></li>
+            <li><a href="{{ url_for('about') }}">About</a></li>
+        </ul>
+    </section>
+{% endblock %}
