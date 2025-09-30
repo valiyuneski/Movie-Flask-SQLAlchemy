@@ -11,18 +11,8 @@
         <h1>🎬 My Movie App</h1>
     </header>
 
-    <nav>
-        <ul>
-            <li><a href="{{ url_for('home') }}">Home</a></li>
-            <li><a href="{{ url_for('list_users') }}">Users</a></li>
-            <li><a href="{{ url_for('about') }}">About</a></li>
-        </ul>
-    </nav>
-
     <main>
-        {% block content %}
-        <!-- Page-specific content will go here -->
-        {% endblock %}
+        {% block content %}{% endblock %}
     </main>
 
     <footer>
