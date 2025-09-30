@@ -29,26 +29,36 @@ with app.app_context():
 
 @app.route('/', methods=['GET'])
 def index():
-    """Render the homepage with a list of registered users GET by default"""
-    users = data_manager.get_users()
-    return render_template('index.html', users=users)
+    """Render the homepage with a list of registered users (GET by default)."""
+    try:
+        users = data_manager.get_users()
+        return render_template('index.html', users=users)
+    except Exception as e:
+        return render_template('error.html', message=f"Failed to load users: {e}"), 500
 
 
 @app.route('/users', methods=['POST'])
 def add_user():
     """Add a new user from form input."""
-    # When the user submits the “add user” form, a POST request is made.
-    # The server receives the new user info, adds it to the database, then redirects back to /.
-    name = request.form.get('name')
-    data_manager.create_user(name)
-    return redirect('/')
+    try:
+        name = request.form.get('name')
+        if not name:
+            return render_template('error.html', message="User name is required."), 400
+
+        data_manager.create_user(name)
+        return redirect('/')
+    except Exception as e:
+        return render_template('error.html', message=f"Failed to add user: {e}"), 500
 
 
 @app.route('/users/<int:user_id>/movies', methods=['GET'])
 def list_favorite_movies_by_user(user_id):
     """Retrieve and display a user's favorite movies."""
-    movies = data_manager.get_movies(user_id)
-    return render_template('movies.html', movies=movies, user_id=user_id)
+    try:
+        movies = data_manager.get_movies(user_id)
+        return render_template('movies.html', movies=movies, user_id=user_id)
+    except Exception as e:
+        return render_template('error.html', message=f"Failed to load movies for user {user_id}: {e}"), 500
 
 
 @app.route('/users/<int:user_id>/movies', methods=['POST'])
@@ -88,18 +98,27 @@ def add_favorite_movie_by_user(user_id):
 @app.route('/users/<int:user_id>/movies/<int:movie_id>/update', methods=['POST'])
 def update_movie(user_id, movie_id):
     """Update the title of a user's movie."""
-    # Modify the title of a specific movie in a user’s list, without depending on OMDb 
-    # for corrections.
-    name = request.form.get('name')
-    data_manager.update_movie(movie_id, user_id, name)
-    return redirect(f'/users/{user_id}/movies')
+    try:
+        name = request.form.get('name')
+        if not name:
+            return render_template('error.html', message="Movie name is required."), 400
+
+        data_manager.update_movie(movie_id, user_id, name)
+        return redirect(f'/users/{user_id}/movies')
+
+    except Exception as e:
+        return render_template('error.html', message=f"Failed to update movie: {e}"), 500
 
 
 @app.route('/users/<int:user_id>/movies/<int:movie_id>/delete', methods=['POST'])
 def delete_movie(user_id, movie_id):
-    """DRemove a specific movie from a user’s favorite movie list.."""
-    data_manager.delete_movie(movie_id, user_id)
-    return redirect(f'/users/{user_id}/movies')
+    """Remove a specific movie from a user's favorite movie list."""
+    try:
+        data_manager.delete_movie(movie_id, user_id)
+        return redirect(f'/users/{user_id}/movies')
+
+    except Exception as e:
+        return render_template('error.html', message=f"Failed to delete movie: {e}"), 500
 
 
 @app.errorhandler(404)
