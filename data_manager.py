@@ -1,45 +1,74 @@
-from models import db, User, Movie
+from models import User, Movie
+from models import db
+from sqlalchemy.exc import SQLAlchemyError
 
-class DataManager():
+class DataManager:
     """Handles database operations for users and movies."""
 
     def create_user(self, input_name):
         """Create and store a new user."""
-        new_user = User(name=input_name)
-        db.session.add(new_user)
-        db.session.commit()
-
+        try:
+            new_user = User(name=input_name)
+            db.session.add(new_user)
+            db.session.commit()
+            return new_user
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            print(f"Error creating user: {e}")
+            return None
 
     def get_users(self):
         """Retrieve all users from the database."""
-        return db.session.query(User).all()
-
+        try:
+            return db.session.query(User).all()
+        except SQLAlchemyError as e:
+            print(f"Error fetching users: {e}")
+            return []
 
     def get_movies(self, input_user_id):
         """Retrieve all movies for a given user."""
-        return db.session.query(Movie).filter_by(user_id=input_user_id).all()
-
+        try:
+            return db.session.query(Movie).filter_by(user_id=input_user_id).all()
+        except SQLAlchemyError as e:
+            print(f"Error fetching movies: {e}")
+            return []
 
     def add_movie(self, input_movie):
         """Add a new movie to the database."""
-        new_movie = Movie(**input_movie)
-        db.session.add(new_movie)
-        db.session.commit()
-
+        try:
+            new_movie = Movie(**input_movie)
+            db.session.add(new_movie)
+            db.session.commit()
+            return new_movie
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            print(f"Error adding movie: {e}")
+            return None
 
     def update_movie(self, input_movie_id, input_user_id, input_new_title):
         """Update the title of a user's movie."""
-        db.session.query(Movie).filter(
-            Movie.id == input_movie_id,
-            Movie.user_id == input_user_id
-        ).update({"name": input_new_title})
-        db.session.commit()
-
+        try:
+            updated = db.session.query(Movie).filter(
+                Movie.id == input_movie_id,
+                Movie.user_id == input_user_id
+            ).update({"name": input_new_title})
+            db.session.commit()
+            return updated  # returns number of updated rows
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            print(f"Error updating movie: {e}")
+            return 0
 
     def delete_movie(self, input_movie_id, input_user_id):
         """Delete a movie belonging to a user."""
-        db.session.query(Movie).filter(
-            Movie.id == input_movie_id,
-            Movie.user_id == input_user_id
-        ).delete()
-        db.session.commit()
+        try:
+            deleted = db.session.query(Movie).filter(
+                Movie.id == input_movie_id,
+                Movie.user_id == input_user_id
+            ).delete()
+            db.session.commit()
+            return deleted  # returns number of deleted rows
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            print(f"Error deleting movie: {e}")
+            return 0
