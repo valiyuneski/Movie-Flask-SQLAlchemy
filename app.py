@@ -56,7 +56,8 @@ def list_favorite_movies_by_user(user_id):
     """Retrieve and display a user's favorite movies."""
     try:
         movies = data_manager.get_movies(user_id)
-        return render_template('movies.html', movies=movies, user_id=user_id)
+        user_name = data_manager.get_user_by_id(user_id)
+        return render_template('movies.html', movies=movies, user_id=user_id, user_name=user_name)
     except Exception as e:
         return render_template('error.html', message=f"Failed to load movies for user {user_id}: {e}"), 500
 
@@ -90,9 +91,11 @@ def add_favorite_movie_by_user(user_id):
     except requests.RequestException as e:
         return render_template('error.html', message=f"OMDb request failed: {e}"), 500
 
+
     # After adding, show updated list
     movies = data_manager.get_movies(user_id)
-    return render_template('movies.html', movies=movies, user_id=user_id)
+    user_name = data_manager.get_user_by_id(user_id)
+    return render_template('movies.html', movies=movies, user_id=user_id, user_name=user_name)
 
 
 @app.route('/users/<int:user_id>/movies/<int:movie_id>/update', methods=['POST'])

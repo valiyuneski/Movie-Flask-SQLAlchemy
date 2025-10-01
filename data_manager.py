@@ -25,6 +25,17 @@ class DataManager:
             print(f"Error fetching users: {e}")
             return []
 
+
+    def get_user_by_id(self, input_user_id) -> str:
+        """Retrieve a user's name by their ID."""
+        try:
+            user = db.session.query(User).filter_by(id=input_user_id).first()
+            return user.name if user else "Unknown User"
+        except SQLAlchemyError as e:
+            print(f"Error fetching user by ID: {e}")
+            return "Unknown User"
+        
+
     def get_movies(self, input_user_id):
         """Retrieve all movies for a given user."""
         try:

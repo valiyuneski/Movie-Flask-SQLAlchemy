@@ -3,37 +3,39 @@
 {% block title %}Movies - My Movie App{% endblock %}
 
 {% block content %}
-    <h1>🎥 Favorite Movies for User {{ user_id }}</h1>
+    <h1>🎥 Movies for {{ user_name }} (ID: {{ user_id }})</h1>
 
-    <ul>
+    <div class="movie-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px;">
         {% for movie in movies %}
-            <li>
-                <strong>{{ movie.name }}</strong> ({{ movie.year }}) — Directed by {{ movie.director }}<br>
-                <img src="{{ movie.poster_url }}" alt="{{ movie.name }} poster" width="100">
+            <div class="movie-card" style="border: 1px solid #ddd; border-radius: 10px; padding: 15px; background: #fafafa; text-align: center;">
+                <strong>{{ movie.name }}</strong> ({{ movie.year }})<br>
+                <em>Directed by {{ movie.director }}</em><br>
+                <img src="{{ movie.poster_url }}" alt="{{ movie.name }} poster" style="width: 150px; height: auto; margin: 10px 0;">
 
-                <!-- Update movie title -->
-                <form action="{{ url_for('update_movie', user_id=user_id, movie_id=movie.id) }}" method="post">
-                    <input type="text" name="name" placeholder="New title" required>
+                <!-- Update movie title (inline input + button) -->
+                <form action="{{ url_for('update_movie', user_id=user_id, movie_id=movie.id) }}" method="post" 
+                      style="display: flex; gap: 8px; margin-top: 10px; justify-content: center;">
+                    <input type="text" name="name" placeholder="New title" required 
+                           style="flex: 1; padding: 5px;">
                     <button type="submit">Update</button>
                 </form>
 
                 <!-- Delete movie -->
-                <form action="{{ url_for('delete_movie', user_id=user_id, movie_id=movie.id) }}" method="post">
+                <form action="{{ url_for('delete_movie', user_id=user_id, movie_id=movie.id) }}" method="post" style="margin-top: 8px;">
                     <button type="submit">Delete</button>
                 </form>
-            </li>
+            </div>
         {% else %}
-            <li>No movies yet. Add one below!</li>
+            <p>No movies yet. Add one below!</p>
         {% endfor %}
-    </ul>
+    </div>
 
-    <h2>Add a Movie</h2>
-    <form action="{{ url_for('add_favorite_movie_by_user', user_id=user_id) }}" method="post">
-        <label for="name">Movie Title:</label>
-        <input type="text" id="name" name="name" required>
+    <h2 style="margin-top: 30px;">Add a Movie</h2>
+    <form action="{{ url_for('add_favorite_movie_by_user', user_id=user_id) }}" method="post" style="display: flex; gap: 8px; max-width: 400px;">
+        <input type="text" id="name" name="name" placeholder="Movie Title" required style="flex: 1; padding: 5px;">
         <button type="submit">Add Movie</button>
     </form>
 
     <!-- Link back to users list -->
-    <p><a href="{{ url_for('index') }}">⬅ Back to Users</a></p>
+    <p style="margin-top: 20px;"><a href="{{ url_for('index') }}">⬅ Back to Users</a></p>
 {% endblock %}
