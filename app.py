@@ -67,9 +67,7 @@ def add_favorite_movie_by_user(user_id):
     """POST: Add a new movie to a user's favorites"""
     load_dotenv()
     name = request.form.get('name')
-    API_KEY = "a0e3f8d3"
-    params = {'t': name, 'apikey': "a0e3f8d3"}
-    #params = {'t': name, 'apikey': os.getenv("API_KEY")}
+    params = {'t': name, 'apikey': os.getenv("API_KEY")}
 
     try:
         response = requests.get('https://www.omdbapi.com/', params=params, timeout=5)
