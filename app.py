@@ -106,8 +106,11 @@ def update_movie(user_id, movie_id):
         if not name:
             return render_template('error.html', message="Movie name is required."), 400
 
-        data_manager.update_movie(movie_id, user_id, name)
-        return redirect(f'/users/{user_id}/movies')
+        updated_rows = data_manager.update_movie(movie_id, user_id, name)
+        if updated_rows == 1:
+            return redirect(f'/users/{user_id}/movies')
+        else:
+            return render_template('error.html', message="Movie not found or not updated."), 404
 
     except Exception as e:
         return render_template('error.html', message=f"Failed to update movie: {e}"), 500
