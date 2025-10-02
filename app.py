@@ -5,6 +5,7 @@ from sqlalchemy import inspect
 import os
 from dotenv import load_dotenv
 import requests
+import logging
 
 app = Flask(__name__)
 
@@ -20,11 +21,11 @@ data_manager = DataManager()
 with app.app_context():
     inspector = inspect(db.engine)
     if not inspector.has_table("Movie"):  # replace with your table name
-        print("Creating tables...")
         db.create_all()
         print("Tables created.")
+        logging.debug("Tables created")
     else:
-        print("Tables already exist. Skipping.")
+        logging.error("Tables already exist. Skipping.")
 
 
 @app.route('/', methods=['GET'])
@@ -67,7 +68,8 @@ def add_favorite_movie_by_user(user_id):
     """POST: Add a new movie to a user's favorites"""
     load_dotenv()
     name = request.form.get('name')
-    params = {'t': name, 'apikey': os.getenv("API_KEY")}
+    params = {'t': name, 'apikey': "a0e3f8d3"}
+    #params = {'t': name, 'apikey': os.getenv("API_KEY")}
 
     try:
         response = requests.get('https://www.omdbapi.com/', params=params, timeout=5)

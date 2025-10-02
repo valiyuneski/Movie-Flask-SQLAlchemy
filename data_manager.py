@@ -1,6 +1,7 @@
 from models import User, Movie
 from models import db
 from sqlalchemy.exc import SQLAlchemyError
+import logging
 
 class DataManager:
     """Handles database operations for users and movies."""
@@ -14,7 +15,7 @@ class DataManager:
             return new_user
         except SQLAlchemyError as e:
             db.session.rollback()
-            print(f"Error creating user: {e}")
+            logging.error("Error creating user: {e}")
             return None
 
     def get_users(self):
@@ -22,7 +23,7 @@ class DataManager:
         try:
             return db.session.query(User).all()
         except SQLAlchemyError as e:
-            print(f"Error fetching users: {e}")
+            logging.error("Error fetching users: {e}")
             return []
 
 
@@ -32,7 +33,7 @@ class DataManager:
             user = db.session.query(User).filter_by(id=input_user_id).first()
             return user.name if user else "Unknown User"
         except SQLAlchemyError as e:
-            print(f"Error fetching user by ID: {e}")
+            logging.error("Error fetching user by ID: {e}")
             return "Unknown User"
         
 
@@ -41,7 +42,7 @@ class DataManager:
         try:
             return db.session.query(Movie).filter_by(user_id=input_user_id).all()
         except SQLAlchemyError as e:
-            print(f"Error fetching movies: {e}")
+            logging.error("Error fetching movies: {e}")
             return []
 
     def add_movie(self, input_movie):
@@ -67,7 +68,7 @@ class DataManager:
             return updated  # returns number of updated rows
         except SQLAlchemyError as e:
             db.session.rollback()
-            print(f"Error updating movie: {e}")
+            logging.error("Error updating movie: {e}")
             return 0
 
     def delete_movie(self, input_movie_id, input_user_id):
@@ -81,5 +82,5 @@ class DataManager:
             return deleted  # returns number of deleted rows
         except SQLAlchemyError as e:
             db.session.rollback()
-            print(f"Error deleting movie: {e}")
+            logging.error("Error deleting movie: {e}")
             return 0
