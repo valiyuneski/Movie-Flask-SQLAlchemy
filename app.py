@@ -51,8 +51,10 @@ def add_user():
         if not name:
             return render_template('error.html', message="User name is required."), 400
 
-        data_manager.create_user(name)
-        return redirect('/')
+        if data_manager.create_user(name) is not None:
+            return redirect('/')
+        else:
+            return render_template('error.html', message="User creation failed."), 500
     except Exception as e:
         return render_template('error.html', message=f"Failed to add user: {e}"), 500
 
