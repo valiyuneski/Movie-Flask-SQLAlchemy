@@ -2,12 +2,17 @@ from flask import Flask, render_template, request, redirect, url_for
 from data_manager import DataManager
 from models import db, Movie
 from sqlalchemy import inspect
-import os
 from dotenv import load_dotenv
+import os
 import requests
 import logging
 
 app = Flask(__name__)
+
+logging.basicConfig(level=logging.DEBUG)
+
+load_dotenv()
+API_KEY = os.getenv("API_KEY")
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///movies.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -66,11 +71,11 @@ def list_favorite_movies_by_user(user_id):
 @app.route('/users/<int:user_id>/movies', methods=['POST'])
 def add_favorite_movie_by_user(user_id):
     """POST: Add a new movie to a user's favorites"""
-    load_dotenv()
     name = request.form.get('name')
-    params = {'t': name, 'apikey': "a0e3f8d3"}
-    #params = {'t': name, 'apikey': os.getenv("API_KEY")}
+    params = {'t': name, 'apikey': API_KEY}
 
+    if not API_KEY:
+        return render_template('error.html', message=f"API_KEY not found! Please set it in the .env file."), 500
     try:
         response = requests.get('https://www.omdbapi.com/', params=params, timeout=5)
         response.raise_for_status()
@@ -87,7 +92,6 @@ def add_favorite_movie_by_user(user_id):
             "user_id": user_id
         }
         data_manager.add_movie(movie)
-
     except requests.RequestException as e:
         return render_template('error.html', message=f"OMDb request failed: {e}"), 500
 
@@ -111,7 +115,6 @@ def update_movie(user_id, movie_id):
             return redirect(url_for('movies', user_id=user_id))
         else:
             return render_template('error.html', message="Movie not found or not updated."), 404
-
     except Exception as e:
         return render_template('error.html', message=f"Failed to update movie: {e}"), 500
 
@@ -123,7 +126,6 @@ def delete_movie(user_id, movie_id):
         data_manager.delete_movie(movie_id, user_id)
 
         return redirect(url_for('movies', user_id=user_id))
-
     except Exception as e:
         return render_template('error.html', message=f"Failed to delete movie: {e}"), 500
 
