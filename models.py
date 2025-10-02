@@ -7,6 +7,9 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
 
+    # One-to-many relationship: a user can have many movies
+    movies = db.relationship('Movie', backref='user', lazy=True)
+
 class Movie(db.Model):
     """Model representing a movie."""
     id = db.Column(db.Integer, primary_key=True)
