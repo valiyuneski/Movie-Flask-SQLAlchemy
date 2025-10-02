@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, url_for
 from data_manager import DataManager
 from models import db, Movie
 from sqlalchemy import inspect
@@ -108,7 +108,7 @@ def update_movie(user_id, movie_id):
 
         updated_rows = data_manager.update_movie(movie_id, user_id, name)
         if updated_rows == 1:
-            return redirect(f'/users/{user_id}/movies')
+            return redirect(url_for('movies', user_id=user_id))
         else:
             return render_template('error.html', message="Movie not found or not updated."), 404
 
@@ -121,7 +121,8 @@ def delete_movie(user_id, movie_id):
     """Remove a specific movie from a user's favorite movie list."""
     try:
         data_manager.delete_movie(movie_id, user_id)
-        return redirect(f'/users/{user_id}/movies')
+
+        return redirect(url_for('movies', user_id=user_id))
 
     except Exception as e:
         return render_template('error.html', message=f"Failed to delete movie: {e}"), 500
