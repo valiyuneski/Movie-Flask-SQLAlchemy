@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 import os
 import requests
 import logging
+import re
 
 app = Flask(__name__)
 
@@ -31,6 +32,15 @@ with app.app_context():
         logging.debug("Tables created")
     else:
         logging.error("Tables already exist. Skipping.")
+
+
+def parse_year(year_str) -> int | None:
+    """Extract the year as an integer from a string, or return None if invalid."""
+    if not year_str:
+        return None
+    # Extract first 4 digits only
+    match = re.match(r"(\d{4})", year_str)
+    return int(match.group(1)) if match else None
 
 
 @app.route('/', methods=['GET'])
@@ -86,10 +96,12 @@ def add_favorite_movie_by_user(user_id):
         if movie_data.get("Response") != "True":
             return render_template('error.html', message="Movie not found in OMDb API."), 404
 
+        int_omdb_api_year = parse_year(movie_data['Year'])
+
         movie = {
             "name": movie_data['Title'],
             "director": movie_data['Director'],
-            "year": movie_data['Year'],
+            "year": int_omdb_api_year,
             "poster_url": movie_data['Poster'],
             "user_id": user_id
         }
@@ -108,6 +120,7 @@ def add_favorite_movie_by_user(user_id):
 def update_movie(user_id, movie_id):
     """Update the title of a user's movie."""
     try:
+        """"""
         name = request.form.get('name')
         if not name:
             return render_template('error.html', message="Movie name is required."), 400
